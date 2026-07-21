@@ -7,7 +7,20 @@ import {
   type DomainErrorCode,
   type SeverityLevel,
   type SystemMode,
+  SIMULATION_STATUSES,
+  type SimulationStatus,
 } from '@secfly/shared-types';
+
+export const SIMULATION_STATUS_LABELS: Record<SimulationStatus, string> = {
+  CREATED: 'Создано',
+  READY: 'Готово к запуску',
+  RUNNING: 'Моделирование выполняется',
+  PAUSED: 'Моделирование приостановлено',
+  STOPPED: 'Моделирование остановлено',
+  COMPLETED: 'Маршрут завершён',
+  RESET: 'Состояние сброшено',
+  FAILED: 'Ошибка моделирования',
+};
 
 export const MODE_LABELS: Record<SystemMode, string> = {
   PREFLIGHT: 'Предполётная проверка',
@@ -48,6 +61,9 @@ export const ERROR_LABELS: Record<DomainErrorCode, string> = {
   SEQUENCE_VIOLATION: 'Нарушен порядок событий',
   CONFIGURATION_ERROR: 'Параметры системы заданы неверно',
   DECISION_NOT_RECORDED: 'Решение не записано, действие запрещено',
+  INVALID_TRANSITION: 'Переход состояния запрещён',
+  SIMULATION_NOT_FOUND: 'Виртуальный запуск не создан',
+  SIMULATION_LIMIT_REACHED: 'Достигнуто ограничение моделирования',
 };
 
 export const ACTION_LABELS = {
@@ -67,4 +83,5 @@ export const PUBLIC_DICTIONARY_KEYS = {
   componentStates: COMPONENT_STATES,
   severityLevels: SEVERITY_LEVELS,
   errors: DOMAIN_ERROR_CODES,
+  simulationStatuses: SIMULATION_STATUSES,
 } as const;

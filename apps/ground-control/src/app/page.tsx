@@ -10,10 +10,10 @@ const navigation = [
 ];
 const components = [
   ['Бортовая логика', 'Каркас запущен'],
-  ['Виртуальная модель', 'Физическая модель ещё не реализована'],
+  ['Виртуальная модель', 'Упрощённая синтетическая модель доступна'],
   ['Шлюз данных', 'Ожидает синтетические сообщения'],
-  ['Средство запуска сценариев', 'Доступна только проверка каркаса'],
-  ['Контроль безопасности', 'Логика переходов будет добавлена на следующем этапе'],
+  ['Средство запуска сценариев', 'Доступны безопасные демонстрационные команды'],
+  ['Контроль безопасности', 'Логика переходов будет добавлена на отдельном будущем этапе'],
 ] as const;
 
 export default function HomePage() {
@@ -35,7 +35,11 @@ export default function HomePage() {
         {navigation.map((item) => (
           <a
             key={item}
-            href={`#${item.toLowerCase().replaceAll(' ', '-')}`}
+            href={
+              item === 'Моделирование'
+                ? '/simulation'
+                : `#${item.toLowerCase().replaceAll(' ', '-')}`
+            }
             className="rounded-lg border border-slate-700 bg-slate-900/70 px-3 py-2 text-sm text-slate-200 hover:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-300"
           >
             {item}
@@ -75,8 +79,6 @@ export default function HomePage() {
           <h2 className="text-xl font-semibold text-cyan-100">Что будет реализовано далее</h2>
           <ul className="mt-3 grid gap-2 text-slate-300">
             {[
-              'синтетическая модель аппарата',
-              'виртуальная телеметрия',
               'моделирование канала связи',
               'конечный автомат безопасных режимов',
               'сценарии неисправностей',

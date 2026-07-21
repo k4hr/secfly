@@ -10,6 +10,8 @@
     "test": "vitest run src"
   },
   "dependencies": {
+    "@secfly/shared-types": "workspace:*",
+    "@secfly/ui": "workspace:*",
     "next": "^16.2.10",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"

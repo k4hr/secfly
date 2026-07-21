@@ -1,5 +1,39 @@
 # Mermaid-диаграммы SecFly
 
+## Работа модели ЭТАПА 2
+
+```mermaid
+flowchart LR
+    UI["Русский интерфейс /simulation"] -->|"проверенные команды"| API["API Simulator"]
+    API --> Service["SimulationService"]
+    Service --> Clock["VirtualClock"]
+    Service --> Lifecycle["SimulationLifecycle"]
+    Service --> Stepper["Чистый SimulationStepper"]
+    Stepper --> State["Неизменяемое синтетическое состояние"]
+    Service --> Log["Дополняемый журнал в памяти"]
+    State --> API
+    Log --> API
+```
+
+```mermaid
+stateDiagram-v2
+    [*] --> CREATED
+    CREATED --> READY
+    READY --> RUNNING
+    RUNNING --> PAUSED
+    PAUSED --> RUNNING
+    RUNNING --> STOPPED
+    PAUSED --> STOPPED
+    RUNNING --> COMPLETED
+    RUNNING --> FAILED
+    STOPPED --> RESET
+    COMPLETED --> RESET
+    FAILED --> RESET
+    RESET --> READY
+```
+
+Этот lifecycle относится только к запуску модели и не реализует конечный автомат безопасных режимов.
+
 ## Системный контекст
 
 ```mermaid

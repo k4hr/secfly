@@ -49,6 +49,12 @@ importers:
 
   apps/ground-control:
     dependencies:
+      '@secfly/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared-types
+      '@secfly/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       next:
         specifier: ^16.2.10
         version: 16.2.10(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -93,6 +99,9 @@ importers:
       '@secfly/shared-types':
         specifier: workspace:*
         version: link:../../packages/shared-types
+      '@secfly/simulator':
+        specifier: workspace:*
+        version: link:../simulator
     devDependencies:
       tsx:
         specifier: ^4.20.3
@@ -103,9 +112,21 @@ importers:
       '@secfly/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@secfly/event-log':
+        specifier: workspace:*
+        version: link:../../packages/event-log
+      '@secfly/protocol':
+        specifier: workspace:*
+        version: link:../../packages/protocol
+      '@secfly/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared-types
       fastify:
         specifier: ^5.4.0
         version: 5.10.0
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
     devDependencies:
       tsx:
         specifier: ^4.20.3

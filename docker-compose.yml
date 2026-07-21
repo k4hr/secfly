@@ -14,6 +14,8 @@ x-secfly-service: &secfly-service
     SECFLY_DIAGNOSTICS_ENABLED: 'false'
   networks:
     - secfly-internal
+  stop_grace_period: 10s
+  pids_limit: 256
 
 services:
   ground-control:
@@ -24,6 +26,11 @@ services:
       dockerfile: infra/docker/ground-control.Dockerfile
     ports:
       - '3000:3000'
+    environment:
+      SECFLY_SIMULATOR_URL: http://simulator:4102
+    depends_on:
+      simulator:
+        condition: service_healthy
     healthcheck:
       test:
         [
@@ -105,3 +112,4 @@ services:
 networks:
   secfly-internal:
     driver: bridge
+    internal: true

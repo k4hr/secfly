@@ -17,4 +17,12 @@ describe('командная оболочка', () => {
   it('отклоняет неизвестную команду', async () => {
     expect(await runCli(['неизвестно'], () => undefined)).toBe(2);
   });
+  it.each(['simulation-demo', 'simulation-step', 'simulation-state'])(
+    'выполняет безопасную команду %s',
+    async (command) => {
+      const messages: string[] = [];
+      expect(await runCli([command], (message) => messages.push(message))).toBe(0);
+      expect(messages).toContain('Все данные являются синтетическими');
+    },
+  );
 });

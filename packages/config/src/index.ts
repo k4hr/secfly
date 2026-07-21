@@ -1,6 +1,8 @@
 import { domainError, err, ok, type DomainError, type Result } from '@secfly/shared-types';
 import { z } from 'zod';
 
+export * from './simulation-config.js';
+
 const environmentSchema = z
   .object({
     SECFLY_ENVIRONMENT: z.enum(['development', 'test', 'production']).default('development'),

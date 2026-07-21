@@ -25,6 +25,43 @@ export const schemaVersionSchema = z.object({
 export const timestampSchema = z.string().datetime({ offset: true });
 export const sequenceSchema = z.number().int().nonnegative();
 
+export const simulationEventTypeSchema = z.enum([
+  'SimulationRunCreated',
+  'SimulationPrepared',
+  'SimulationStarted',
+  'SimulationPaused',
+  'SimulationResumed',
+  'SimulationStopped',
+  'SimulationReset',
+  'SimulationStepCompleted',
+  'VehiclePositionChanged',
+  'BatteryLevelChanged',
+  'WaypointReached',
+  'RouteCompleted',
+  'SimulationFailed',
+]);
+
+export const simulationEventPayloadSchema = z
+  .object({
+    userDescription: z.string().min(1).max(500),
+    details: z.record(z.union([z.string(), z.number().finite(), z.boolean()])),
+  })
+  .strict();
+
+export const simulationEventEnvelopeSchema = z
+  .object({
+    messageId: identifierSchema,
+    messageType: simulationEventTypeSchema,
+    schemaVersion: schemaVersionSchema,
+    runId: identifierSchema,
+    sequence: sequenceSchema,
+    timestamp: timestampSchema,
+    correlationId: identifierSchema,
+    causationId: identifierSchema,
+    payload: simulationEventPayloadSchema,
+  })
+  .strict();
+
 const envelopeBaseSchema = z
   .object({
     messageId: identifierSchema,

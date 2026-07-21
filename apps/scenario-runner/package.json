@@ -8,15 +8,19 @@
   },
   "scripts": {
     "dev": "tsx src/index.ts --help",
-    "build": "tsc -p tsconfig.json",
+    "build": "corepack pnpm --filter @secfly/simulator build && tsc -p tsconfig.json",
     "start": "node dist/index.js",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "corepack pnpm --filter @secfly/simulator build && tsc -p tsconfig.json --noEmit",
     "test": "vitest run src",
-    "bootstrap-check": "tsx src/index.ts bootstrap-check"
+    "bootstrap-check": "tsx src/index.ts bootstrap-check",
+    "simulation-demo": "tsx src/index.ts simulation-demo",
+    "simulation-step": "tsx src/index.ts simulation-step",
+    "simulation-state": "tsx src/index.ts simulation-state"
   },
   "dependencies": {
     "@secfly/event-log": "workspace:*",
-    "@secfly/shared-types": "workspace:*"
+    "@secfly/shared-types": "workspace:*",
+    "@secfly/simulator": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.20.3"

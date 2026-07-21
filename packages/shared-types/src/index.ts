@@ -4,3 +4,4 @@ export * from './identifiers.js';
 export * from './messages.js';
 export * from './modes.js';
 export * from './result.js';
+export * from './simulation.js';

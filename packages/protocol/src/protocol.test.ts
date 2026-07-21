@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { parseMessageEnvelope } from './index.js';
+import {
+  parseMessageEnvelope,
+  simulationEventEnvelopeSchema,
+  simulationEventTypeSchema,
+} from './index.js';
 
 const valid = {
   messageId: 'msg-1',
@@ -35,5 +39,27 @@ describe('проверка оболочки сообщения', () => {
     const result = parseMessageEnvelope(input, payload, policy);
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.userMessage).toContain(message);
+  });
+});
+
+describe('события синтетической модели', () => {
+  it.each(simulationEventTypeSchema.options)('проверяет событие %s', (messageType) => {
+    expect(
+      simulationEventEnvelopeSchema.safeParse({
+        ...valid,
+        messageType,
+        payload: { userDescription: 'Русское описание события.', details: { step: 1 } },
+      }).success,
+    ).toBe(true);
+  });
+
+  it('отклоняет неконечное значение в деталях', () => {
+    expect(
+      simulationEventEnvelopeSchema.safeParse({
+        ...valid,
+        messageType: 'SimulationStarted',
+        payload: { userDescription: 'Запуск.', details: { value: Number.NaN } },
+      }).success,
+    ).toBe(false);
   });
 });
