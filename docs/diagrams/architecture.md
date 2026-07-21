@@ -1,26 +1,26 @@
-# Mermaid-диаграммы AeroGuard
+# Mermaid-диаграммы SecFly
 
 ## Системный контекст
 
 ```mermaid
 flowchart LR
-    Operator["Оператор исследования"] -->|"валидируемые simulation-команды"| GCS["Ground Control"]
-    Author["Автор сценария"] -->|"versioned YAML/JSON"| Runner["Scenario Runner"]
-    GCS --> Gateway["Telemetry Gateway"]
+    Operator["Оператор исследования"] -->|"проверяемые команды моделирования"| GCS["Наземный интерфейс"]
+    Author["Автор сценария"] -->|"версионируемые YAML/JSON"| Runner["Средство запуска сценариев"]
+    GCS --> Gateway["Шлюз данных"]
     Runner --> Gateway
-    Gateway --> Core["Onboard Core"]
-    Core --> Estimator["State Estimator"]
-    Estimator --> Safety["Safety Engine\nединственный арбитр"]
-    Safety -->|"accepted simulation intent"| Sim["Virtual Vehicle Simulator"]
-    Sim -->|"synthetic observations"| Gateway
-    Runner --> Faults["Fault Injection"]
-    Faults -->|"run-scoped effects"| Gateway
-    Faults -->|"run-scoped effects"| Sim
-    Core --> Log["Append-only Event Recorder"]
+    Gateway --> Core["Бортовая логика"]
+    Core --> Estimator["Оценка состояния"]
+    Estimator --> Safety["Контроль безопасности\nединственный арбитр"]
+    Safety -->|"разрешённое намерение модели"| Sim["Виртуальная модель аппарата"]
+    Sim -->|"синтетические наблюдения"| Gateway
+    Runner --> Faults["Ввод виртуальных неисправностей"]
+    Faults -->|"воздействия одного запуска"| Gateway
+    Faults -->|"воздействия одного запуска"| Sim
+    Core --> Log["Дополняемый журнал событий"]
     Safety --> Log
     Gateway --> Log
-    Log -->|"read models / replay"| GCS
-    Log -->|"assertion trace"| Runner
+    Log -->|"представления и воспроизведение"| GCS
+    Log -->|"след проверок"| Runner
 ```
 
 ## Trust boundaries и поток решения
@@ -28,93 +28,93 @@ flowchart LR
 ```mermaid
 sequenceDiagram
     autonumber
-    participant R as Scenario Runner / GCS
-    participant G as Gateway
-    participant E as State Estimator
-    participant C as Onboard Core
-    participant S as Safety Engine
-    participant L as Event Recorder
-    participant V as Virtual Simulator
+    participant R as Запуск сценария / интерфейс
+    participant G as Шлюз данных
+    participant E as Оценка состояния
+    participant C as Бортовая логика
+    participant S as Контроль безопасности
+    participant L as Журнал событий
+    participant V as Виртуальная модель
 
-    R->>G: Versioned command or fault
-    G->>G: Validate schema, run, expiry, idempotency
-    V-->>G: Synthetic sensor samples
-    G->>E: Delivered observations
-    E->>E: Freshness, disagreement, confidence decay
-    E-->>C: Immutable StateEstimate
-    C->>S: ModeTransitionRequested
-    S->>S: Whitelist + mandatory guards + priority
-    S->>L: Accepted or rejected SafetyDecision
-    alt decision persisted and accepted
-        L-->>S: sequence assigned
-        S->>V: Simulation intent
-        V-->>L: SimulatorStateChanged
-    else rejected or persistence failed
-        S-->>C: No side effect; safe fallback/fault
+    R->>G: Версионируемая команда или неисправность
+    G->>G: Проверка схемы, запуска, срока и повторов
+    V-->>G: Синтетические показания датчиков
+    G->>E: Доставленные наблюдения
+    E->>E: Свежесть, расхождение, снижение достоверности
+    E-->>C: Неизменяемая оценка состояния
+    C->>S: Запрос смены режима
+    S->>S: Разрешённый список, условия и приоритет
+    S->>L: Принятое или отклонённое решение
+    alt решение записано и принято
+        L-->>S: Назначен порядковый номер
+        S->>V: Намерение виртуальной модели
+        V-->>L: Состояние модели изменено
+    else запрос отклонён или запись не выполнена
+        S-->>C: Эффекта нет; безопасный отказ
     end
 ```
 
-## State machine
+## Конечный автомат
 
 ```mermaid
 stateDiagram-v2
     [*] --> PREFLIGHT
-    PREFLIGHT --> MANUAL_CONTROL: checks + stable link + handover
-    PREFLIGHT --> ASSISTED_CONTROL: checks + assisted policy
-    PREFLIGHT --> EMERGENCY_STOP: invalid/unrecoverable preflight
+    PREFLIGHT --> MANUAL_CONTROL: проверки, стабильная связь, передача управления
+    PREFLIGHT --> ASSISTED_CONTROL: проверки и разрешённая поддержка
+    PREFLIGHT --> EMERGENCY_STOP: неустранимая ошибка проверки
 
-    MANUAL_CONTROL --> LINK_DEGRADED: heartbeat/quality breach
-    ASSISTED_CONTROL --> LINK_DEGRADED: heartbeat/quality breach
+    MANUAL_CONTROL --> LINK_DEGRADED: нарушена проверка связи
+    ASSISTED_CONTROL --> LINK_DEGRADED: нарушена проверка связи
 
-    LINK_DEGRADED --> AUTONOMOUS_HOLD: position confidence sufficient
-    LINK_DEGRADED --> RETURN_TO_HOME: return guards pass
-    LINK_DEGRADED --> SAFE_WAYPOINT: safe-point guards pass
-    LINK_DEGRADED --> CONTROLLED_LANDING: motion unsafe
+    LINK_DEGRADED --> AUTONOMOUS_HOLD: достоверность положения достаточна
+    LINK_DEGRADED --> RETURN_TO_HOME: условия возврата выполнены
+    LINK_DEGRADED --> SAFE_WAYPOINT: условия безопасной точки выполнены
+    LINK_DEGRADED --> CONTROLLED_LANDING: движение небезопасно
 
-    AUTONOMOUS_HOLD --> RETURN_TO_HOME: hold timeout + return safe
-    AUTONOMOUS_HOLD --> CONTROLLED_LANDING: hold fallback
-    RETURN_TO_HOME --> CONTROLLED_LANDING: home reached / nav unsafe
-    SAFE_WAYPOINT --> CONTROLLED_LANDING: point reached / nav unsafe
-    CONTROLLED_LANDING --> LANDED: fresh landed confirmation
+    AUTONOMOUS_HOLD --> RETURN_TO_HOME: истёк срок удержания, возврат безопасен
+    AUTONOMOUS_HOLD --> CONTROLLED_LANDING: резервный вариант удержания
+    RETURN_TO_HOME --> CONTROLLED_LANDING: точка достигнута или навигация небезопасна
+    SAFE_WAYPOINT --> CONTROLLED_LANDING: точка достигнута или навигация небезопасна
+    CONTROLLED_LANDING --> LANDED: получено свежее подтверждение посадки
 
-    AUTONOMOUS_HOLD --> RECOVERY_PENDING: stable recovery window
-    RETURN_TO_HOME --> RECOVERY_PENDING: stable recovery window
-    SAFE_WAYPOINT --> RECOVERY_PENDING: stable recovery window
-    RECOVERY_PENDING --> MANUAL_CONTROL: explicit safe handover
-    RECOVERY_PENDING --> ASSISTED_CONTROL: explicit safe handover
-    RECOVERY_PENDING --> AUTONOMOUS_HOLD: timeout / rejected handover
+    AUTONOMOUS_HOLD --> RECOVERY_PENDING: связь стабильна заданное время
+    RETURN_TO_HOME --> RECOVERY_PENDING: связь стабильна заданное время
+    SAFE_WAYPOINT --> RECOVERY_PENDING: связь стабильна заданное время
+    RECOVERY_PENDING --> MANUAL_CONTROL: явная безопасная передача управления
+    RECOVERY_PENDING --> ASSISTED_CONTROL: явная безопасная передача управления
+    RECOVERY_PENDING --> AUTONOMOUS_HOLD: срок истёк или передача отклонена
 
-    PREFLIGHT --> FAULT: recoverable internal fault
-    MANUAL_CONTROL --> FAULT: recoverable internal fault
-    ASSISTED_CONTROL --> FAULT: recoverable internal fault
-    LINK_DEGRADED --> FAULT: recoverable internal fault
-    FAULT --> CONTROLLED_LANDING: airborne + recorder available
-    FAULT --> LANDED: already landed
+    PREFLIGHT --> FAULT: устранимая внутренняя ошибка
+    MANUAL_CONTROL --> FAULT: устранимая внутренняя ошибка
+    ASSISTED_CONTROL --> FAULT: устранимая внутренняя ошибка
+    LINK_DEGRADED --> FAULT: устранимая внутренняя ошибка
+    FAULT --> CONTROLLED_LANDING: аппарат в виртуальном полёте, журнал доступен
+    FAULT --> LANDED: посадка уже подтверждена
 
-    PREFLIGHT --> EMERGENCY_STOP: explicit simulation stop
-    MANUAL_CONTROL --> EMERGENCY_STOP: explicit stop / integrity loss
-    ASSISTED_CONTROL --> EMERGENCY_STOP: explicit stop / integrity loss
-    LINK_DEGRADED --> EMERGENCY_STOP: explicit stop / integrity loss
-    AUTONOMOUS_HOLD --> EMERGENCY_STOP: explicit stop / integrity loss
-    RETURN_TO_HOME --> EMERGENCY_STOP: explicit stop / integrity loss
-    SAFE_WAYPOINT --> EMERGENCY_STOP: explicit stop / integrity loss
-    CONTROLLED_LANDING --> EMERGENCY_STOP: landing timeout / integrity loss
-    FAULT --> EMERGENCY_STOP: unrecoverable
+    PREFLIGHT --> EMERGENCY_STOP: явная остановка моделирования
+    MANUAL_CONTROL --> EMERGENCY_STOP: остановка или потеря целостности
+    ASSISTED_CONTROL --> EMERGENCY_STOP: остановка или потеря целостности
+    LINK_DEGRADED --> EMERGENCY_STOP: остановка или потеря целостности
+    AUTONOMOUS_HOLD --> EMERGENCY_STOP: остановка или потеря целостности
+    RETURN_TO_HOME --> EMERGENCY_STOP: остановка или потеря целостности
+    SAFE_WAYPOINT --> EMERGENCY_STOP: остановка или потеря целостности
+    CONTROLLED_LANDING --> EMERGENCY_STOP: истёк срок или потеря целостности
+    FAULT --> EMERGENCY_STOP: неустранимая ошибка
 
     LANDED --> [*]
     EMERGENCY_STOP --> [*]
 ```
 
-## Детерминированный replay
+## Детерминированное повторное воспроизведение
 
 ```mermaid
 flowchart TD
-    Inputs["Scenario + seed + virtual clock\nconfig/schema/table versions"] --> Execute["Execute run"]
-    Execute --> Events["Ordered append-only events"]
-    Events --> Snapshot["Validated snapshot + sequence"]
-    Inputs --> Replay["Replay"]
+    Inputs["Сценарий, начальное значение, виртуальные часы\nверсии параметров, схемы и таблицы"] --> Execute["Выполнить запуск"]
+    Execute --> Events["Упорядоченные дополняемые события"]
+    Events --> Snapshot["Проверенный снимок и номер"]
+    Inputs --> Replay["Повторное воспроизведение"]
     Snapshot --> Replay
-    Replay --> Compare{"Decision trace identical?"}
-    Compare -->|"yes"| Pass["PASS"]
-    Compare -->|"no"| Fail["FAIL + first divergent sequence"]
+    Replay --> Compare{"След решений совпадает?"}
+    Compare -->|"да"| Pass["Проверка пройдена"]
+    Compare -->|"нет"| Fail["Ошибка и первый номер расхождения"]
 ```

@@ -1,15 +1,15 @@
-# Safety invariants
+# Инварианты безопасности
 
 Инварианты обязательны для всех simulation runs и имеют приоритет над функциональными требованиями.
 
-## Scope invariants
+## Инварианты области применения
 
 - **S-01 Simulation only:** ни один output системы не адресуется физическому устройству или реальному flight controller.
 - **S-02 Synthetic coordinates:** маршруты, home, geofence и safe zones принадлежат абстрактной системе координат.
 - **S-03 Prohibited capabilities absent:** отсутствуют выбор/сопровождение целей, преследование, оружейная нагрузка, применение силы и противодействие подавлению.
 - **S-04 No operational parameters:** конфигурация и документация не поставляют параметры реального аппарата.
 
-## Control invariants
+## Инварианты управления
 
 - **C-01 Single authority:** mode изменяется только принятым `SafetyDecision`.
 - **C-02 Deny by default:** неизвестный или неразрешённый transition всегда отклоняется.
@@ -20,7 +20,7 @@
 - **C-07 Terminal isolation:** LANDED и EMERGENCY_STOP не переходят прямо в активный flight mode.
 - **C-08 Advisory isolation:** ML/heuristic output не является командой, guard result или прямым основанием mode transition.
 
-## Data invariants
+## Инварианты данных
 
 - **D-01 Confidence monotonicity under degradation:** stale, invalid, isolated или менее достоверное наблюдение не повышает confidence.
 - **D-02 Freshness required:** просроченные telemetry/commands не участвуют в положительном safety decision.
@@ -29,7 +29,7 @@
 - **D-05 Run isolation:** событие, fault или command одного run не влияет на другой run.
 - **D-06 Version pinning:** каждое решение использует один immutable config/schema/transition-table snapshot.
 
-## Decision and logging invariants
+## Инварианты решений и журналирования
 
 - **L-01 Decision before effect:** одобренный intent не исполняется до успешной записи SafetyDecision.
 - **L-02 Rejections are auditable:** отклонённые запросы журналируются наравне с принятыми.
@@ -38,7 +38,7 @@
 - **L-05 Immutable safety history:** SafetyDecision и ModeTransition не обновляются и не удаляются обычными retention jobs.
 - **L-06 Replay equivalence:** одинаковые scenario, seed, virtual clock inputs, schemas и config дают тот же ordered decision trace.
 
-## Command invariants
+## Инварианты команд
 
 - **M-01 Idempotency:** повторный `commandId` не создаёт второй side effect и возвращает исходный outcome.
 - **M-02 Expiry:** stale/expired command всегда отклоняется.
@@ -46,7 +46,7 @@
 - **M-04 Authorization separation:** корректная схема не означает разрешение действия; RBAC и safety guards независимы.
 - **M-05 No silent config mutation:** активный run не получает новую конфигурацию без явного lifecycle event и нового run/restart policy.
 
-## Failure invariants
+## Инварианты отказов
 
 - **F-01 Fail safe:** internal error не сохраняет manual control и не разрешает новый movement intent.
 - **F-02 Navigation floor:** RETURN/SAFE_WAYPOINT/HOLD запрещены, когда соответствующая confidence ниже policy floor; выбирается LAND либо остановка симуляции.

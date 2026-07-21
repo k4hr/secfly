@@ -1,0 +1,31 @@
+import { loadConfig } from '@secfly/config';
+import Fastify, { type FastifyInstance } from 'fastify';
+
+export function buildServer(): FastifyInstance {
+  const server = Fastify({ logger: false, bodyLimit: 65_536 });
+  server.get('/health', () => ({
+    component: 'simulator',
+    status: 'RUNNING',
+    simulationOnly: true,
+    movementAvailable: false,
+    message: 'Виртуальная модель работает. Физическая модель ещё не реализована.',
+    version: '0.1.0',
+  }));
+  return server;
+}
+
+export async function startServer(
+  environment: NodeJS.ProcessEnv = process.env,
+): Promise<FastifyInstance> {
+  const config = loadConfig(environment);
+  if (!config.ok) throw new Error(config.error.userMessage);
+  const server = buildServer();
+  const shutdown = async (signal: string) => {
+    server.log.info(`Получен сигнал ${signal}. Виртуальная модель завершает работу.`);
+    await server.close();
+  };
+  process.once('SIGINT', () => void shutdown('SIGINT'));
+  process.once('SIGTERM', () => void shutdown('SIGTERM'));
+  await server.listen({ host: '0.0.0.0', port: config.value.ports.simulator });
+  return server;
+}
