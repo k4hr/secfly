@@ -1,0 +1,115 @@
+name: secfly
+
+x-secfly-service: &secfly-service
+  restart: unless-stopped
+  init: true
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  environment:
+    SECFLY_ENVIRONMENT: production
+    SECFLY_VERSION: 0.1.0
+    SECFLY_LOG_LEVEL: info
+    SECFLY_DIAGNOSTICS_ENABLED: 'false'
+  networks:
+    - secfly-internal
+  stop_grace_period: 10s
+  pids_limit: 256
+
+services:
+  ground-control:
+    <<: *secfly-service
+    container_name: secfly-ground-control
+    build:
+      context: .
+      dockerfile: infra/docker/ground-control.Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      SECFLY_SIMULATOR_URL: http://simulator:4102
+    depends_on:
+      simulator:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  onboard-core:
+    <<: *secfly-service
+    container_name: secfly-onboard-core
+    build:
+      context: .
+      dockerfile: infra/docker/server.Dockerfile
+      args:
+        SECFLY_APP_PACKAGE: '@secfly/onboard-core'
+    environment:
+      SECFLY_ONBOARD_CORE_PORT: 4101
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:4101/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  simulator:
+    <<: *secfly-service
+    container_name: secfly-simulator
+    build:
+      context: .
+      dockerfile: infra/docker/server.Dockerfile
+      args:
+        SECFLY_APP_PACKAGE: '@secfly/simulator'
+    environment:
+      SECFLY_SIMULATOR_PORT: 4102
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:4102/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  telemetry-gateway:
+    <<: *secfly-service
+    container_name: secfly-telemetry-gateway
+    build:
+      context: .
+      dockerfile: infra/docker/server.Dockerfile
+      args:
+        SECFLY_APP_PACKAGE: '@secfly/telemetry-gateway'
+    environment:
+      SECFLY_TELEMETRY_GATEWAY_PORT: 4103
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:4103/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+networks:
+  secfly-internal:
+    driver: bridge
+    internal: true

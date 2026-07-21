@@ -1,0 +1,19 @@
+name: Сообщить об ошибке
+description: Ошибка в программном каркасе SecFly
+title: '[Ошибка]: '
+labels: [ошибка]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Описание
+      description: Что произошло и какой результат ожидался?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Воспроизведение
+      description: Укажите только синтетические данные и безопасные шаги.
+    validations:
+      required: true

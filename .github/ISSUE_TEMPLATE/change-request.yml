@@ -1,0 +1,12 @@
+name: Запрос на изменение
+description: Архитектурное или процессное изменение
+title: '[Изменение]: '
+labels: [изменение]
+body:
+  - type: textarea
+    id: decision
+    attributes:
+      label: Предлагаемое решение
+      description: Объясните последствия и необходимость ADR.
+    validations:
+      required: true

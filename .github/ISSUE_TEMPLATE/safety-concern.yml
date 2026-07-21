@@ -1,0 +1,12 @@
+name: Замечание по безопасности
+description: Сообщить о нарушении инварианта или границ проекта
+title: '[Безопасность]: '
+labels: [безопасность]
+body:
+  - type: textarea
+    id: invariant
+    attributes:
+      label: Затронутый инвариант
+      description: Укажите код инварианта и безопасное описание проблемы.
+    validations:
+      required: true

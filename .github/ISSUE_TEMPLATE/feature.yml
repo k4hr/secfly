@@ -1,0 +1,19 @@
+name: Предложить улучшение
+description: Предложение в пределах виртуального моделирования
+title: '[Предложение]: '
+labels: [предложение]
+body:
+  - type: textarea
+    id: purpose
+    attributes:
+      label: Польза
+      description: Какую исследовательскую задачу решает улучшение?
+    validations:
+      required: true
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Проверка области
+      options:
+        - label: Предложение не связано с реальным оборудованием, целями, вооружением или применением силы.
+          required: true

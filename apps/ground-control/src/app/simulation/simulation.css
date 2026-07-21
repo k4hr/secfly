@@ -1,0 +1,204 @@
+.simulation-shell {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: radial-gradient(circle at 85% 0, #17375b 0, #070b14 38%);
+  padding: 28px;
+  color: #eef3ff;
+}
+.simulation-shell > * {
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.simulation-header {
+  display: grid;
+  gap: 10px;
+}
+.simulation-header h1 {
+  margin: 8px 0 0;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+}
+.simulation-header p {
+  margin: 0;
+  color: #b8c4d9;
+}
+.back-link {
+  width: max-content;
+  color: #8bdcff;
+  text-decoration: none;
+}
+.simulation-badge {
+  width: max-content;
+  border: 1px solid #43d9c5;
+  border-radius: 99px;
+  padding: 6px 12px;
+  color: #b7fff5;
+  background: #123b3c;
+}
+.model-warning {
+  margin-top: 22px;
+  padding: 16px 18px;
+  border-left: 4px solid #f6bd60;
+  background: #2f2618;
+  color: #ffe0a6;
+}
+.control-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+.control-panel button,
+.error-panel button {
+  border: 1px solid #3d91b7;
+  border-radius: 10px;
+  background: #10253b;
+  color: #effaff;
+  padding: 11px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.control-panel button:hover,
+.error-panel button:hover {
+  background: #17415e;
+}
+.control-panel button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.error-panel {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-top: 18px;
+  border: 1px solid #ef6b73;
+  background: #3b1820;
+  border-radius: 12px;
+  padding: 14px;
+}
+.state-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+.state-card,
+.plane-card,
+.table-card {
+  border: 1px solid #253d5b;
+  background: #0c1524dd;
+  border-radius: 16px;
+  box-shadow: 0 16px 40px #0004;
+}
+.state-card {
+  padding: 16px;
+  display: grid;
+  gap: 8px;
+}
+.state-card span {
+  font-size: 0.82rem;
+  color: #91a6c4;
+}
+.state-card strong {
+  font-size: 1.08rem;
+}
+.plane-card,
+.table-card {
+  margin-top: 22px;
+  padding: 18px;
+}
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 750;
+  margin: 0 0 16px;
+}
+.simulation-plane {
+  display: block;
+  width: 100%;
+  min-height: 320px;
+  max-height: 620px;
+  background: #08111f;
+  border-radius: 12px;
+  color: #27415e;
+}
+.simulation-plane text {
+  fill: #dceaff;
+  font-size: 2.4px;
+}
+.route-line {
+  stroke: #6585a8;
+  stroke-width: 0.8;
+  stroke-dasharray: 2 1;
+}
+.travelled-line {
+  stroke: #45d6c3;
+  stroke-width: 1.2;
+}
+.home-point {
+  fill: #65e5b0;
+}
+.safe-point {
+  fill: #f6bd60;
+}
+.waypoint {
+  fill: #82aaff;
+}
+.reached-point {
+  fill: #45d6c3;
+}
+.vehicle {
+  fill: #ff6b8a;
+  stroke: #fff;
+  stroke-width: 0.4;
+}
+.plane-note {
+  margin: 12px 0 0;
+  color: #8fa2bd;
+  font-size: 0.88rem;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+.event-log {
+  max-height: 360px;
+  overflow: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+th,
+td {
+  text-align: left;
+  border-bottom: 1px solid #23354d;
+  padding: 11px 10px;
+}
+th {
+  color: #8bdcff;
+  font-size: 0.82rem;
+}
+td {
+  color: #d8e2f2;
+  font-size: 0.9rem;
+}
+@media (max-width: 640px) {
+  .simulation-shell {
+    padding: 18px 14px;
+  }
+  .control-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .control-panel button {
+    padding: 10px 7px;
+  }
+  .simulation-plane {
+    min-height: 260px;
+  }
+  .error-panel {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

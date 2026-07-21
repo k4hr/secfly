@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "baseUrl": ".",
+    "paths": {
+      "@secfly/config": ["packages/config/src/index.ts"],
+      "@secfly/event-log": ["packages/event-log/src/index.ts"],
+      "@secfly/fault-injection": ["packages/fault-injection/src/index.ts"],
+      "@secfly/protocol": ["packages/protocol/src/index.ts"],
+      "@secfly/safety-engine": ["packages/safety-engine/src/index.ts"],
+      "@secfly/shared-types": ["packages/shared-types/src/index.ts"],
+      "@secfly/simulator": ["apps/simulator/src/index.ts"],
+      "@secfly/state-estimator": ["packages/state-estimator/src/index.ts"],
+      "@secfly/test-utils": ["packages/test-utils/src/index.ts"],
+      "@secfly/ui": ["packages/ui/src/index.ts"]
+    },
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Bundler"
+  },
+  "include": ["apps/**/*.ts", "apps/**/*.tsx", "packages/**/*.ts", "*.ts"],
+  "exclude": ["node_modules", "**/.next/**", "**/dist/**"]
+}
